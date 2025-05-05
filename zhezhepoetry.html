@@ -6,9 +6,7 @@
     <title>古诗随机分组工具 - 哲哲用</title>
     <style>
         body {
-            font-family: -apple-system, HarmonyOS Sans, sans-serif;
-            padding: 20px;
-            background-color: #f5f5f5;
+            font-family: -apple-system, "HarmonyOS Sans SC", sans-serif;
         }
         .container {
             max-width: 600px;
@@ -510,17 +508,18 @@
             }).join('');
 
             // 事件委托优化（修复点击失效问题）
-            resultDiv.addEventListener('click', (e) => {
-                const header = e.target.closest('.group-header, .poem-header');
-                if (!header) return;
-                
-                const parent = header.parentElement;
-                if (parent.classList.contains('group')) {
-                    parent.classList.toggle('active');
-                } else {
-                    parent.classList.toggle('active');
-                }
-            });
+resultDiv.addEventListener('click', (e) => {
+    if (e.target.classList.contains('group-header') || 
+        e.target.parentElement.classList.contains('group-header')) {
+        const group = e.target.closest('.group');
+        group.classList.toggle('active');
+    }
+    if (e.target.classList.contains('poem-header') || 
+        e.target.parentElement.classList.contains('poem-header')) {
+        const poemItem = e.target.closest('.poem-item');
+        poemItem.classList.toggle('active');
+    }
+});
         }
 
         // 初始化示例数据
