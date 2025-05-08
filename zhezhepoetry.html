@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>古诗随机分组工具 - 哲哲用</title>
+    <title>哲哲的古诗随机分组工具 </title>
     <style>
         body {
             font-family: -apple-system, "HarmonyOS Sans SC", sans-serif;
@@ -124,14 +124,26 @@
         .poem-item.active .poem-header {
             background-color: #e3f2fd;
         }
+        .poem-item.active .poem-content {
+            display: block;
+        }
+        .poem-item.active .arrow {
+            transform: rotate(90deg);
+        }
+        .group.active .group-content {
+            display: block;
+        }
+        .group.active .arrow {
+            transform: rotate(90deg);
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h2>古诗随机分组工具</h2>
+        <h2>哲哲的古诗随机分组工具</h2>
 
         <div class="input-group">
-            <label>古诗名单（已预置154首）：</label>
+            <label>哲哲的古诗名单（已经有154首咯，加油）：</label>
             <textarea id="names" rows="6">
 咏鹅
 悯农
@@ -298,14 +310,76 @@
             <input type="number" id="groupNum" min="1" value="4">
         </div>
 
-        <button onclick="shuffleAndGroup()">开始随机分组</button>
+        <button onclick="shuffleAndGroup()">开始分组吧，哲哲同学</button>
         
         <div class="button-group" style="margin-top: 15px; display: flex; gap: 10px;">
-            <button onclick="expandAll()" style="flex: 1;">全部展开</button>
-            <button onclick="collapseAll()" style="flex: 1;">全部折叠</button>
+            <button onclick="expandAll()" style="flex: 1;">点这个展开</button>
+            <button onclick="collapseAll()" style="flex: 1;">点这个折叠</button>
         </div>
         
         <div id="result" class="result"></div>
+        
+        <!-- 添加这个隐藏的静态示例区域，始终可用 -->
+        <div style="margin-top: 30px; border-top: 1px solid #eee; padding-top: 20px;">
+            <h3>哲哲同学</h3>
+            <p>这是给哲哲的示例，点击可以展开/折叠：</p>
+            
+            <div class="group" id="static-group-1">
+                <div class="group-header" onclick="document.getElementById('static-group-1').className = document.getElementById('static-group-1').className.indexOf('active') > -1 ? 'group' : 'group active';">
+                    <div><strong>哲哲同学的示例分组一</strong><span>（2首）</span></div>
+                    <div class="arrow">▶</div>
+                </div>
+                <div class="group-content">
+                    <div class="poem-item" id="static-poem-1">
+                        <div class="poem-header" onclick="document.getElementById('static-poem-1').className = document.getElementById('static-poem-1').className.indexOf('active') > -1 ? 'poem-item' : 'poem-item active';">
+                            静夜思
+                            <div class="arrow">▶</div>
+                        </div>
+                        <div class="poem-content">
+                            床前明月光<br>疑是地上霜<br>举头望明月<br>低头思故乡
+                        </div>
+                    </div>
+                    
+                    <div class="poem-item" id="static-poem-2">
+                        <div class="poem-header" onclick="document.getElementById('static-poem-2').className = document.getElementById('static-poem-2').className.indexOf('active') > -1 ? 'poem-item' : 'poem-item active';">
+                            长恨歌（节选三）
+                            <div class="arrow">▶</div>
+                        </div>
+                        <div class="poem-content">
+                            七月七日长生殿<br>夜半无人私语时<br>在天愿作比翼鸟<br>在地愿为连理枝<br>天长地久有时尽<br>此恨绵绵无绝期
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="group" id="static-group-2">
+                <div class="group-header" onclick="document.getElementById('static-group-2').className = document.getElementById('static-group-2').className.indexOf('active') > -1 ? 'group' : 'group active';">
+                    <div><strong>哲哲同学的示例分组二</strong><span>（2首）</span></div>
+                    <div class="arrow">▶</div>
+                </div>
+                <div class="group-content">
+                    <div class="poem-item" id="static-poem-3">
+                        <div class="poem-header" onclick="document.getElementById('static-poem-3').className = document.getElementById('static-poem-3').className.indexOf('active') > -1 ? 'poem-item' : 'poem-item active';">
+                            登鹳雀楼
+                            <div class="arrow">▶</div>
+                        </div>
+                        <div class="poem-content">
+                            白日依山尽<br>黄河入海流<br>欲穷千里目<br>更上一层楼
+                        </div>
+                    </div>
+                    
+                    <div class="poem-item" id="static-poem-4">
+                        <div class="poem-header" onclick="document.getElementById('static-poem-4').className = document.getElementById('static-poem-4').className.indexOf('active') > -1 ? 'poem-item' : 'poem-item active';">
+                            春晓
+                            <div class="arrow">▶</div>
+                        </div>
+                        <div class="poem-content">
+                            春眠不觉晓<br>处处闻啼鸟<br>夜来风雨声<br>花落知多少
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -495,104 +569,74 @@
                 [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
             }
 
-            // 修改这里，使用内联onclick
-            const resultDiv = document.getElementById('result');
-            resultDiv.innerHTML = Array.from({ length: groupNum }, (_, index) => {
+            // 使用最基础的内联onclick
+            let resultHTML = '';
+            
+            for (let index = 0; index < groupNum; index++) {
                 const group = shuffled.filter((_, i) => i % groupNum === index);
-                return `
-                    <div class="group" id="group-${index}">
-                        <div class="group-header" onclick="toggleGroup('group-${index}')">
-                            <div><strong>第 ${index + 1} 组</strong><span>（${group.length}首）</span></div>
-                            <div class="arrow">▶</div>
-                        </div>
-                        <div class="group-content">
-                            ${group.map((poem, poemIdx) => `
-                                <div class="poem-item" id="poem-${index}-${poemIdx}">
-                                    <div class="poem-header" onclick="togglePoem('poem-${index}-${poemIdx}')">
-                                        ${poem}
-                                        <div class="arrow">▶</div>
-                                    </div>
-                                    <div class="poem-content">
-                                        ${poemContents[poem]?.replace(/\n/g, '<br>') || '该诗歌内容暂未收录'}
-                                    </div>
-                                </div>
-                            `).join('')}
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        // 添加这两个辅助函数来处理点击
-        function toggleGroup(id) {
-            const group = document.getElementById(id);
-            if (group) {
-                group.classList.toggle('active');
+                
+                resultHTML += '<div class="group" id="group-' + index + '">';
+                resultHTML += '<div class="group-header" onclick="document.getElementById(\'group-' + index + '\').className = document.getElementById(\'group-' + index + '\').className.indexOf(\'active\') > -1 ? \'group\' : \'group active\';">';
+                resultHTML += '<div><strong>第 ' + (index + 1) + ' 组</strong><span>（' + group.length + '首）</span></div>';
+                resultHTML += '<div class="arrow">▶</div>';
+                resultHTML += '</div>';
+                resultHTML += '<div class="group-content">';
+                
+                for (let poemIdx = 0; poemIdx < group.length; poemIdx++) {
+                    const poem = group[poemIdx];
+                    const poemId = 'poem-' + index + '-' + poemIdx;
+                    
+                    resultHTML += '<div class="poem-item" id="' + poemId + '">';
+                    resultHTML += '<div class="poem-header" onclick="document.getElementById(\'' + poemId + '\').className = document.getElementById(\'' + poemId + '\').className.indexOf(\'active\') > -1 ? \'poem-item\' : \'poem-item active\';">';
+                    resultHTML += poem;
+                    resultHTML += '<div class="arrow">▶</div>';
+                    resultHTML += '</div>';
+                    resultHTML += '<div class="poem-content">';
+                    
+                    const content = poemContents[poem];
+                    if (content) {
+                        resultHTML += content.replace(/\n/g, '<br>');
+                    } else {
+                        resultHTML += '该诗歌内容暂未收录';
+                    }
+                    
+                    resultHTML += '</div>';
+                    resultHTML += '</div>';
+                }
+                
+                resultHTML += '</div>';
+                resultHTML += '</div>';
             }
+            
+            document.getElementById('result').innerHTML = resultHTML;
         }
         
-        function togglePoem(id) {
-            const poem = document.getElementById(id);
-            if (poem) {
-                poem.classList.toggle('active');
-            }
-        }
-        
-        // 修改这两个函数的实现方式
+        // 最简单的展开/折叠全部函数
         function expandAll() {
-            const groups = document.querySelectorAll('.group');
-            const poems = document.querySelectorAll('.poem-item');
+            var groups = document.getElementsByClassName('group');
+            var poems = document.getElementsByClassName('poem-item');
             
-            groups.forEach(group => {
-                group.classList.add('active');
-            });
+            for (var i = 0; i < groups.length; i++) {
+                groups[i].className = 'group active';
+            }
             
-            poems.forEach(poem => {
-                poem.classList.add('active');
-            });
+            for (var i = 0; i < poems.length; i++) {
+                poems[i].className = 'poem-item active';
+            }
         }
         
         function collapseAll() {
-            const groups = document.querySelectorAll('.group');
-            const poems = document.querySelectorAll('.poem-item');
+            var groups = document.getElementsByClassName('group');
+            var poems = document.getElementsByClassName('poem-item');
             
-            groups.forEach(group => {
-                group.classList.remove('active');
-            });
-            
-            poems.forEach(poem => {
-                poem.classList.remove('active');
-            });
-        }
-        
-        // 初始化示例，确保离线时也有内容可点击
-        window.onload = function() {
-            document.getElementById('names').value = document.getElementById('names').value.trim();
-            
-            // 为初始示例内容添加点击处理
-            const resultDiv = document.getElementById('result');
-            if (resultDiv && resultDiv.innerHTML.trim() === '') {
-                resultDiv.innerHTML = `
-                    <div class="group" id="example-group">
-                        <div class="group-header" onclick="toggleGroup('example-group')">
-                            <div><strong>示例分组</strong><span>（点击展开/折叠）</span></div>
-                            <div class="arrow">▶</div>
-                        </div>
-                        <div class="group-content">
-                            <div class="poem-item" id="example-poem">
-                                <div class="poem-header" onclick="togglePoem('example-poem')">
-                                    静夜思
-                                    <div class="arrow">▶</div>
-                                </div>
-                                <div class="poem-content">
-                                    床前明月光<br>疑是地上霜<br>举头望明月<br>低头思故乡
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `;
+            for (var i = 0; i < groups.length; i++) {
+                groups[i].className = 'group';
             }
-        };
+            
+            for (var i = 0; i < poems.length; i++) {
+                poems[i].className = 'poem-item';
+            }
+        }
     </script>
 </body>
 </html>
