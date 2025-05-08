@@ -495,19 +495,20 @@
                 [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
             }
 
+            // 修改这里，使用内联onclick
             const resultDiv = document.getElementById('result');
             resultDiv.innerHTML = Array.from({ length: groupNum }, (_, index) => {
                 const group = shuffled.filter((_, i) => i % groupNum === index);
                 return `
-                    <div class="group">
-                        <div class="group-header">
+                    <div class="group" id="group-${index}">
+                        <div class="group-header" onclick="toggleGroup('group-${index}')">
                             <div><strong>第 ${index + 1} 组</strong><span>（${group.length}首）</span></div>
                             <div class="arrow">▶</div>
                         </div>
                         <div class="group-content">
-                            ${group.map(poem => `
-                                <div class="poem-item">
-                                    <div class="poem-header">
+                            ${group.map((poem, poemIdx) => `
+                                <div class="poem-item" id="poem-${index}-${poemIdx}">
+                                    <div class="poem-header" onclick="togglePoem('poem-${index}-${poemIdx}')">
                                         ${poem}
                                         <div class="arrow">▶</div>
                                     </div>
@@ -522,7 +523,22 @@
             }).join('');
         }
 
-        // 全部展开函数
+        // 添加这两个辅助函数来处理点击
+        function toggleGroup(id) {
+            const group = document.getElementById(id);
+            if (group) {
+                group.classList.toggle('active');
+            }
+        }
+        
+        function togglePoem(id) {
+            const poem = document.getElementById(id);
+            if (poem) {
+                poem.classList.toggle('active');
+            }
+        }
+        
+        // 修改这两个函数的实现方式
         function expandAll() {
             const groups = document.querySelectorAll('.group');
             const poems = document.querySelectorAll('.poem-item');
@@ -536,7 +552,6 @@
             });
         }
         
-        // 全部折叠函数
         function collapseAll() {
             const groups = document.querySelectorAll('.group');
             const poems = document.querySelectorAll('.poem-item');
@@ -549,32 +564,35 @@
                 poem.classList.remove('active');
             });
         }
-
-        // 初始化示例数据
-        window.addEventListener('DOMContentLoaded', () => {
+        
+        // 初始化示例，确保离线时也有内容可点击
+        window.onload = function() {
             document.getElementById('names').value = document.getElementById('names').value.trim();
             
-            // 添加事件委托，确保离线保存后折叠/展开功能仍然正常工作
-            document.addEventListener('click', (e) => {
-                // 处理组标题点击
-                if (e.target.classList.contains('group-header') || 
-                    e.target.parentElement.classList.contains('group-header') ||
-                    (e.target.parentElement && e.target.parentElement.parentElement && 
-                     e.target.parentElement.parentElement.classList.contains('group-header'))) {
-                    const group = e.target.closest('.group');
-                    if (group) group.classList.toggle('active');
-                }
-                
-                // 处理诗歌标题点击
-                if (e.target.classList.contains('poem-header') || 
-                    e.target.parentElement.classList.contains('poem-header') ||
-                    (e.target.parentElement && e.target.parentElement.parentElement && 
-                     e.target.parentElement.parentElement.classList.contains('poem-header'))) {
-                    const poemItem = e.target.closest('.poem-item');
-                    if (poemItem) poemItem.classList.toggle('active');
-                }
-            });
-        });
+            // 为初始示例内容添加点击处理
+            const resultDiv = document.getElementById('result');
+            if (resultDiv && resultDiv.innerHTML.trim() === '') {
+                resultDiv.innerHTML = `
+                    <div class="group" id="example-group">
+                        <div class="group-header" onclick="toggleGroup('example-group')">
+                            <div><strong>示例分组</strong><span>（点击展开/折叠）</span></div>
+                            <div class="arrow">▶</div>
+                        </div>
+                        <div class="group-content">
+                            <div class="poem-item" id="example-poem">
+                                <div class="poem-header" onclick="togglePoem('example-poem')">
+                                    静夜思
+                                    <div class="arrow">▶</div>
+                                </div>
+                                <div class="poem-content">
+                                    床前明月光<br>疑是地上霜<br>举头望明月<br>低头思故乡
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+        };
     </script>
 </body>
 </html>
